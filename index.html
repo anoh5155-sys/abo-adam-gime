@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>لعبة الدكتور ماركت - نسخة الموبايل الخفيفة</title>
+    <title>لعبة الدكتور ماركت - الموسيقية الخفيفة</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700;900&display=swap" rel="stylesheet">
     <style>
         body {
@@ -12,7 +12,7 @@
             overflow: hidden;
             background: linear-gradient(135deg, #fdfbfb, #ebedee, #ffdde1);
             font-family: 'Cairo', sans-serif;
-            touch-action: none; /* يمنع الشاشة من النزول والطلوع مع اللمس */
+            touch-action: none;
         }
         
         #gameCanvas {
@@ -92,7 +92,6 @@
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
 
-        /* بصمة المصمم VIP */
         .credits-container {
             position: absolute;
             bottom: 50px; 
@@ -116,7 +115,6 @@
 
         .credits span { color: #ffeb3b; }
         
-        /* شريط الأخبار السفلي */
         .ticker-container {
             position: absolute;
             bottom: 0; width: 100%;
@@ -140,7 +138,6 @@
             100% { transform: translate3d(100%, 0, 0); }
         }
         
-        /* شاشة البداية */
         #start-screen {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -165,6 +162,11 @@
 </head>
 <body>
 
+    <!-- ملف الموسيقى (تأكد من رفعه على جيت هوب باسم music.mp3) -->
+    <audio id="bgMusic" loop>
+        <source src="music.mp3" type="audio/mpeg">
+    </audio>
+
     <canvas id="gameCanvas"></canvas>
 
     <div id="ui-layer">
@@ -181,7 +183,6 @@
         </div>
     </div>
 
-    <!-- طبقة الفروع واسم المصمم -->
     <div class="credits-container">
         <div class="credits">
             👑 تصميم: <span>يوسف ابو ادم</span> | 📞 <span>01020390989</span>
@@ -205,6 +206,7 @@
     <script>
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
+        const bgMusic = document.getElementById('bgMusic');
         
         let width, height;
         function resize() {
@@ -226,11 +228,15 @@
         let currentBasketX = width / 2;
         let basketY = 0; 
 
+        // المنتجات الجديدة اللي طلبتها
         const productTypes = [
-            { name: 'استربس سمارت', emoji: '🍗', color: '#e65100' },
-            { name: 'استربس ولعتين', emoji: '🌶️', color: '#b71c1c' },
-            { name: 'منتجات إيلو', emoji: '🥫', color: '#1b5e20' },
-            { name: 'منتجات ميتكو', emoji: '🥩', color: '#3e2723' }
+            { name: 'منتجات فروزن', emoji: '🧊', color: '#00838F' },
+            { name: 'مستلزمات مطاعم', emoji: '🍽️', color: '#455A64' },
+            { name: 'للكافيهات', emoji: '☕', color: '#4E342E' },
+            { name: 'منتجات ورقية', emoji: '📦', color: '#616161' },
+            { name: 'صوصات ومرقات', emoji: '🥫', color: '#C62828' },
+            { name: 'أطعمة مشروبات', emoji: '🧋', color: '#6A1B9A' },
+            { name: 'كايزر ماك', emoji: '🍔', color: '#EF6C00' }
         ];
         
         let items = [];
@@ -251,7 +257,11 @@
             if (gameInterval) clearInterval(gameInterval);
             if (dropInterval) clearInterval(dropInterval);
 
-            basketY = height - 120; // ارتفاع السلة
+            // تشغيل الموسيقى
+            bgMusic.currentTime = 0;
+            bgMusic.play().catch(e => console.log("تحتاج للضغط على الشاشة لتشغيل الصوت"));
+
+            basketY = height - 120; 
             document.getElementById('start-screen').style.display = 'none';
             score = 0; timeLeft = 60; items = [];
             isPlaying = true;
@@ -284,6 +294,10 @@
             isPlaying = false;
             clearInterval(gameInterval);
             clearInterval(dropInterval);
+            
+            // إيقاف الموسيقى عند انتهاء الوقت
+            bgMusic.pause();
+
             const startScreen = document.getElementById('start-screen');
             startScreen.style.display = 'flex';
             startScreen.innerHTML = `
@@ -295,24 +309,23 @@
 
         function gameLoop() {
             if (!isPlaying) return;
-            // مسح الشاشة
+            
+            // مسح الشاشة بالكامل لتفادي التهنيج
             ctx.clearRect(0, 0, width, height);
             
-            // حركة السلة (بدون دوران لتخفيف الحمل)
             currentBasketX += (targetBasketX - currentBasketX) * 0.25;
 
-            // رسم السلة بأرقام صحيحة لمنع التهنيج
+            // رسم الباسكت
             ctx.font = "120px Arial";
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
             ctx.fillText('🛒', Math.floor(currentBasketX), Math.floor(basketY));
             
-            // رسم المنتجات
+            // رسم المنتجات الجديدة
             for (let i = items.length - 1; i >= 0; i--) {
                 let item = items[i];
                 item.y += item.speed;
                 
-                // رسم المنتج (بدون دوران وبدون مؤثرات خلفية)
                 ctx.font = "45px Arial";
                 ctx.fillText(item.emoji, Math.floor(item.x), Math.floor(item.y));
                 
@@ -320,16 +333,14 @@
                 ctx.fillStyle = item.color;
                 ctx.fillText(item.name, Math.floor(item.x), Math.floor(item.y) + 35);   
                 
-                // حساب الاصطدام
                 const dist = Math.hypot(item.x - currentBasketX, item.y - basketY);
-                if (dist < 85) { // مساحة اصطدام مناسبة للسلة
+                if (dist < 85) { 
                     score += 10;
                     document.getElementById('score').innerText = score;
                     items.splice(i, 1);
                     continue;
                 }
                 
-                // حذف المنتج لو نزل تحت الشاشة
                 if (item.y > height + 50) items.splice(i, 1);
             }
             
