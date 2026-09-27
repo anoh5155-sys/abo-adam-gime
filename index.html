@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>لعبة الدكتور ماركت - الأداء الأقصى</title>
+    <title>لعبة الدكتور ماركت - نسخة الموبايل الخفيفة</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700;900&display=swap" rel="stylesheet">
     <style>
         body {
@@ -12,7 +12,7 @@
             overflow: hidden;
             background: linear-gradient(135deg, #fdfbfb, #ebedee, #ffdde1);
             font-family: 'Cairo', sans-serif;
-            touch-action: none;
+            touch-action: none; /* يمنع الشاشة من النزول والطلوع مع اللمس */
         }
         
         #gameCanvas {
@@ -38,75 +38,64 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             width: 100%;
         }
 
         .logo {
-            width: 55px; 
-            height: 55px;
+            width: 50px; 
+            height: 50px;
             border-radius: 50%;
-            border: 3px solid #fff;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            border: 2px solid #fff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
             background-color: white;
             object-fit: cover;
         }
         
         h1 { 
             margin: 0; 
-            font-size: 32px; 
+            font-size: 28px; 
             color: #d32f2f; 
-            text-shadow: 2px 2px 0 #fff; 
+            text-shadow: 1px 1px 0 #fff; 
             white-space: nowrap;
         }
 
         .sub-address {
-            font-size: 13px;
+            font-size: 12px;
             color: #fff;
             background: #d32f2f;
-            padding: 3px 15px;
+            padding: 3px 12px;
             border-radius: 20px;
-            margin: 8px 5px;
-            border: 2px solid #fff;
+            margin: 5px;
+            border: 1px solid #fff;
             text-align: center;
-            max-width: 90%;
-            line-height: 1.4;
+            max-width: 95%;
+            line-height: 1.3;
         }
 
         .glowing-text { 
-            margin: 5px 0; 
-            font-size: 22px; 
+            margin: 2px 0; 
+            font-size: 18px; 
             color: #1976d2; 
-            text-shadow: 0 0 5px #fff, 0 0 10px #fff;
             font-weight: 900;
         }
         
         #score-board {
-            margin-top: 10px;
-            padding: 5px 25px;
-            font-size: 20px;
+            margin-top: 5px;
+            padding: 5px 20px;
+            font-size: 18px;
             font-weight: bold;
             color: #222;
-            background: rgba(255, 255, 255, 0.7);
-            border: 2px solid rgba(255, 255, 255, 0.9);
-            border-radius: 30px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid #fff;
+            border-radius: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
 
-        .score-pop {
-            animation: popScore 0.3s ease-out;
-        }
-
-        @keyframes popScore {
-            0% { transform: scale(1); color: #d32f2f; }
-            50% { transform: scale(1.5); color: #ffeb3b; }
-            100% { transform: scale(1); color: #d32f2f; }
-        }
-        
-        /* إعطاء أولوية (z-index) قوية جداً لاسمك وشريط الفروع ليظلوا في المقدمة دائماً */
+        /* بصمة المصمم VIP */
         .credits-container {
             position: absolute;
-            bottom: 60px; 
+            bottom: 50px; 
             width: 100%;
             display: flex;
             justify-content: center;
@@ -117,38 +106,29 @@
         .credits {
             background: linear-gradient(45deg, #1976d2, #d32f2f);
             color: white;
-            padding: 8px 25px;
-            border-radius: 30px;
-            font-size: 16px;
+            padding: 5px 20px;
+            border-radius: 20px;
+            font-size: 14px;
             font-weight: 900;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
             border: 2px solid #fff;
             white-space: nowrap;
-            animation: creditsPulse 2s infinite alternate;
         }
 
-        .credits span {
-            color: #ffeb3b; 
-            text-shadow: 0 0 5px rgba(255, 235, 59, 0.5);
-        }
-
-        @keyframes creditsPulse {
-            0% { transform: scale(1); box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-            100% { transform: scale(1.05); box-shadow: 0 8px 20px rgba(211,47,47,0.5); }
-        }
+        .credits span { color: #ffeb3b; }
         
+        /* شريط الأخبار السفلي */
         .ticker-container {
             position: absolute;
             bottom: 0; width: 100%;
             background: #212121;
             color: #ffeb3b;
-            padding: 10px 0;
-            font-size: 15px;
+            padding: 8px 0;
+            font-size: 14px;
             white-space: nowrap;
             overflow: hidden;
             pointer-events: auto;
-            border-top: 3px solid #d32f2f;
-            z-index: 10; /* حل مشكلة اختفاء الشريط */
+            border-top: 2px solid #d32f2f;
+            z-index: 10; 
         }
         .ticker-text {
             display: inline-block;
@@ -160,10 +140,11 @@
             100% { transform: translate3d(100%, 0, 0); }
         }
         
+        /* شاشة البداية */
         #start-screen {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255,255,255,0.9);
+            background: rgba(255,255,255,0.95);
             display: flex; flex-direction: column;
             align-items: center; justify-content: center;
             pointer-events: auto; z-index: 20;
@@ -171,25 +152,14 @@
         .btn {
             background: #d32f2f;
             color: white;
-            border: 3px solid #fff;
-            padding: 12px 40px;
-            font-size: 24px;
+            border: 2px solid #fff;
+            padding: 10px 30px;
+            font-size: 22px;
             font-weight: 900;
             font-family: 'Cairo', sans-serif;
-            border-radius: 50px;
-            margin-top: 20px;
+            border-radius: 30px;
+            margin-top: 15px;
             cursor: pointer;
-            box-shadow: 0 5px 15px rgba(211,47,47,0.3);
-        }
-        .btn:active { transform: scale(0.95); }
-
-        @media (min-width: 768px) {
-            h1 { font-size: 45px; }
-            .logo { width: 85px; height: 85px; }
-            .sub-address { font-size: 17px; }
-            .glowing-text { font-size: 30px; }
-            #score-board { font-size: 24px; }
-            .credits { font-size: 20px; padding: 10px 35px; }
         }
     </style>
 </head>
@@ -207,11 +177,11 @@
         <div class="glowing-text">العب واكسب مع الدكتور ماركت</div>
         
         <div id="score-board">
-            النقاط: <span id="score" style="color:#d32f2f; display:inline-block;">0</span> | الوقت: <span id="time" style="color:#1976d2;">60</span>
+            النقاط: <span id="score" style="color:#d32f2f;">0</span> | الوقت: <span id="time" style="color:#1976d2;">60</span>
         </div>
     </div>
 
-    <!-- طبقة الفروع واسم المصمم تم رفعها بـ Z-index 10 لتكون فوق الكانفاس دائماً -->
+    <!-- طبقة الفروع واسم المصمم -->
     <div class="credits-container">
         <div class="credits">
             👑 تصميم: <span>يوسف ابو ادم</span> | 📞 <span>01020390989</span>
@@ -225,10 +195,10 @@
     </div>
 
     <div id="start-screen">
-        <img src="doctor.png" style="width:100px; height:100px; border-radius:50%; border:4px solid #fff; margin-bottom:15px;">
-        <h1 style="font-size:45px;">الدكتور ماركت</h1>
-        <div class="glowing-text" style="font-size:26px;">العب واكسب مع الدكتور ماركت</div>
-        <p style="font-size:18px; color:#444; font-weight:bold; text-align:center; padding:0 20px;">حرك الماوس أو المس الشاشة لتوجيه السلة واجمع المنتجات!</p>
+        <img src="doctor.png" style="width:80px; height:80px; border-radius:50%; border:3px solid #fff; margin-bottom:10px;">
+        <h1 style="font-size:35px;">الدكتور ماركت</h1>
+        <div class="glowing-text" style="font-size:22px;">العب واكسب مع الدكتور ماركت</div>
+        <p style="font-size:16px; color:#444; font-weight:bold; text-align:center; padding:0 15px;">حرك إصبعك لتوجيه السلة واجمع المنتجات!</p>
         <button class="btn" onclick="startGame()">ابدأ التحدي 🛒</button>
     </div>
 
@@ -254,7 +224,6 @@
         
         let targetBasketX = width / 2;
         let currentBasketX = width / 2;
-        let basketTilt = 0;
         let basketY = 0; 
 
         const productTypes = [
@@ -265,17 +234,16 @@
         ];
         
         let items = [];
-        let particles = [];
 
         canvas.addEventListener('mousemove', (e) => {
             if(!isPlaying) return;
-            targetBasketX = Math.max(70, Math.min(width - 70, e.clientX));
+            targetBasketX = Math.max(60, Math.min(width - 60, e.clientX));
         });
 
         canvas.addEventListener('touchmove', (e) => {
             if(!isPlaying) return;
             e.preventDefault(); 
-            targetBasketX = Math.max(70, Math.min(width - 70, e.touches[0].clientX));
+            targetBasketX = Math.max(60, Math.min(width - 60, e.touches[0].clientX));
         }, {passive: false});
 
         function startGame() {
@@ -283,9 +251,9 @@
             if (gameInterval) clearInterval(gameInterval);
             if (dropInterval) clearInterval(dropInterval);
 
-            basketY = height - 140; 
+            basketY = height - 120; // ارتفاع السلة
             document.getElementById('start-screen').style.display = 'none';
-            score = 0; timeLeft = 60; items = []; particles = [];
+            score = 0; timeLeft = 60; items = [];
             isPlaying = true;
             targetBasketX = currentBasketX = width / 2;
             document.getElementById('score').innerText = score;
@@ -297,7 +265,7 @@
                 if (timeLeft <= 0) endGame();
             }, 1000);
             
-            dropInterval = setInterval(spawnItem, 600); 
+            dropInterval = setInterval(spawnItem, 650); 
             animationId = requestAnimationFrame(gameLoop);
         }
 
@@ -305,34 +273,11 @@
             if(!isPlaying) return;
             const type = productTypes[Math.floor(Math.random() * productTypes.length)];
             items.push({
-                x: Math.random() * (width - 100) + 50,
-                y: -60,
+                x: Math.random() * (width - 80) + 40,
+                y: -50,
                 speed: Math.random() * 3.5 + 3.5, 
-                angle: 0,
-                rotationSpeed: (Math.random() - 0.5) * 0.1, 
                 ...type
             });
-        }
-
-        function createExplosion(x, y, color) {
-            for(let i=0; i<10; i++) {
-                particles.push({
-                    x: x, y: y,
-                    vx: (Math.random() - 0.5) * 12,
-                    vy: (Math.random() - 1) * 8, 
-                    life: 1,
-                    color: color,
-                    size: Math.random() * 5 + 3
-                });
-            }
-        }
-
-        function triggerScoreAnimation() {
-            const scoreSpan = document.getElementById('score');
-            scoreSpan.innerText = score;
-            scoreSpan.classList.remove('score-pop');
-            void scoreSpan.offsetWidth; 
-            scoreSpan.classList.add('score-pop');
         }
 
         function endGame() {
@@ -342,75 +287,49 @@
             const startScreen = document.getElementById('start-screen');
             startScreen.style.display = 'flex';
             startScreen.innerHTML = `
-                <h1 style="color:#d32f2f; font-size:45px; margin:0;">انتهى الوقت!</h1>
-                <h2 style="font-size:35px; margin-top:10px; color:#222;">جمعت <strong style="color:#ff9800;">${score}</strong> نقطة 🏆</h2>
+                <h1 style="color:#d32f2f; font-size:35px; margin:0;">انتهى الوقت!</h1>
+                <h2 style="font-size:28px; margin-top:10px; color:#222;">جمعت <strong style="color:#ff9800;">${score}</strong> نقطة 🏆</h2>
                 <button class="btn" onclick="startGame()">العب مرة أخرى 🔄</button>
             `;
         }
 
         function gameLoop() {
             if (!isPlaying) return;
+            // مسح الشاشة
             ctx.clearRect(0, 0, width, height);
             
-            currentBasketX += (targetBasketX - currentBasketX) * 0.2;
-            basketTilt = (targetBasketX - currentBasketX) * 0.003; 
+            // حركة السلة (بدون دوران لتخفيف الحمل)
+            currentBasketX += (targetBasketX - currentBasketX) * 0.25;
 
-            ctx.save();
-            ctx.translate(currentBasketX, basketY);
-            ctx.rotate(basketTilt);
-            ctx.font = "140px Arial";
+            // رسم السلة بأرقام صحيحة لمنع التهنيج
+            ctx.font = "120px Arial";
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
-            ctx.fillText('🛒', 0, 0);
-            ctx.restore();
+            ctx.fillText('🛒', Math.floor(currentBasketX), Math.floor(basketY));
             
-            for(let i = particles.length - 1; i >= 0; i--) {
-                let p = particles[i];
-                p.vy += 0.3; 
-                p.x += p.vx; 
-                p.y += p.vy;
-                p.life -= 0.04;
-                if(p.life <= 0) { particles.splice(i, 1); continue; }
-                
-                ctx.globalAlpha = p.life;
-                ctx.fillStyle = p.color;
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-                ctx.fill();
-            }
-            ctx.globalAlpha = 1; 
-
+            // رسم المنتجات
             for (let i = items.length - 1; i >= 0; i--) {
                 let item = items[i];
                 item.y += item.speed;
-                item.angle += item.rotationSpeed;
                 
-                ctx.save();
-                ctx.translate(item.x, item.y);
-                ctx.rotate(item.angle);
-                ctx.font = "50px Arial";
-                ctx.textAlign = "center";
-                ctx.textBaseline = "middle";
-                ctx.fillText(item.emoji, 0, 0);
-                ctx.restore();
+                // رسم المنتج (بدون دوران وبدون مؤثرات خلفية)
+                ctx.font = "45px Arial";
+                ctx.fillText(item.emoji, Math.floor(item.x), Math.floor(item.y));
                 
-                ctx.font = "bold 17px 'Cairo', sans-serif";
-                ctx.textAlign = "center";
-                
-                ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
-                ctx.fillRect(item.x - 45, item.y + 25, 90, 22);
+                ctx.font = "bold 15px 'Cairo', sans-serif";
                 ctx.fillStyle = item.color;
-                ctx.fillText(item.name, item.x, item.y + 42);   
+                ctx.fillText(item.name, Math.floor(item.x), Math.floor(item.y) + 35);   
                 
+                // حساب الاصطدام
                 const dist = Math.hypot(item.x - currentBasketX, item.y - basketY);
-                if (dist < 100) {
+                if (dist < 85) { // مساحة اصطدام مناسبة للسلة
                     score += 10;
-                    triggerScoreAnimation(); 
-                    createExplosion(item.x, item.y, item.color); 
+                    document.getElementById('score').innerText = score;
                     items.splice(i, 1);
                     continue;
                 }
                 
+                // حذف المنتج لو نزل تحت الشاشة
                 if (item.y > height + 50) items.splice(i, 1);
             }
             
