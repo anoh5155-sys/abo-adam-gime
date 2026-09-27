@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>الدكتور ماركت لتجارة المواد الغذائية</title>
+    
+    <!-- مكتبة Tailwind CSS للتصميم -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            font-family: 'Tajawal', sans-serif;
+            touch-action: pan-y;
+            user-select: none;
+            -webkit-user-select: none;
+            box-sizing: border-box;
+        }
+        
+        body {
+            /* مساحة إضافية في الأسفل لشريط الأخبار */
+            padding-bottom: 50px; 
+            overflow-x: hidden;
+            background-color: #f0fdf4; /* لون خلفية مريح */
+        }
+
+        /* أنيميشن للقائمة الافتتاحية */
+        @keyframes pulse-soft {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        .animate-pulse-soft {
+            animation: pulse-soft 2s infinite ease-in-out;
+        }
+
+        /* إعدادات شريط الأخبار المتحرك */
+        .ticker-wrap {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 40px;
+            background-color: #166534; /* أخضر داكن */
+            color: white;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            z-index: 1000;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.3);
+        }
+        
+        .ticker-content {
+            display: inline-block;
+            white-space: nowrap;
+            padding-right: 100%;
+            animation: ticker 30s linear infinite;
+            font-weight: 700;
+            font-size: 15px;
+        }
+
+        /* اتجاه الحركة لليمين لأن الموقع باللغة العربية RTL */
+        @keyframes ticker {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(100%); } 
+        }
+
+        /* تحسينات لشكل الصور إذا لم تكن موجودة */
+        img {
+            object-fit: contain;
+            background-color: rgba(255, 255, 255, 0.5);
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-green-50 to-emerald-100 min-h-screen flex flex-col items-center">
+
+    <!-- لوجو ريجوزا في الهامش (أعلى اليسار) -->
+    <img src="rigosa.jpg" alt="Rigosa Logo" onerror="this.style.display='none'" class="fixed top-4 left-4 w-16 h-16 rounded-full border-2 border-emerald-600 shadow-lg z-50 object-cover">
+
+    <!-- رأس الصفحة: لوجو الدكتور ماركت واسم اللعبة -->
+    <header class="w-full max-w-lg mt-6 flex flex-col items-center justify-center z-10 px-4">
+        <div class="bg-white/90 backdrop-blur-md px-6 py-4 rounded-3xl shadow-lg border-2 border-emerald-500 flex flex-col items-center w-full">
+            <img src="doctor.png" alt="الدكتور ماركت" onerror="this.style.display='none'" class="h-24 mx-auto mb-2">
+            <h1 class="text-2xl font-black text-emerald-800 text-center leading-tight">الدكتور ماركت لتجارة المواد الغذائية</h1>
+        </div>
+    </header>
+
+    <!-- لوحة النقاط والوقت -->
+    <div class="w-full max-w-lg grid grid-cols-2 gap-4 my-4 px-4 text-center z-10">
+        <div class="bg-white rounded-2xl p-3 border-2 border-emerald-400 shadow-md">
+            <div class="text-gray-500 text-sm font-bold">النقاط 🏆</div>
+            <div id="scoreVal" class="text-3xl font-black text-emerald-700">0</div>
+        </div>
+        <div class="bg-white rounded-2xl p-3 border-2 border-red-400 shadow-md">
+            <div class="text-gray-500 text-sm font-bold">الوقت المتبقي ⏱️</div>
+            <div id="timeVal" class="text-3xl font-black text-red-600">60</div>
+        </div>
+    </div>
+
+    <!-- منطقة اللعبة (Canvas) -->
+    <main class="relative w-full max-w-lg flex-1 min-h-[350px] max-h-[55vh] mx-2 rounded-3xl overflow-hidden shadow-2xl border-4 border-emerald-500 bg-gradient-to-b from-blue-50 to-green-100 mb-2">
+        <canvas id="gameCanvas" class="w-full h-full block cursor-pointer touch-none"></canvas>
+
+        <!-- نافذة البداية -->
+        <div id="startModal" class="absolute inset-0 bg-black/60 backdrop-blur-sm flex flex-col items-center justify-center p-4 text-center text-white z-20">
+            <div class="bg-white text-slate-800 p-6 rounded-3xl shadow-2xl w-full max-w-xs border-4 border-emerald-500">
+                <div class="text-6xl mb-2 animate-pulse-soft">🛒</div>
+                <h2 class="text-2xl font-black text-emerald-800 mb-2">مرحباً بك!</h2>
+                <p class="text-sm text-gray-600 mb-4 font-bold">حرك السلة واجمع منتجات السوبر ماركت قبل انتهاء الـ 60 ثانية!</p>
+                
+                <div class="grid grid-cols-1 gap-2 text-sm font-bold text-slate-700 bg-emerald-50 p-3 rounded-xl border border-emerald-200 mb-6 text-right">
+                    <div>📦 منتجات ميتكو: 25 نقطة</div>
+                    <div>🥫 منتجات إيلو: 20 نقطة</div>
+                    <div>🍗 استربس سمارت: 15 نقطة</div>
+                    <div>🍟 كيس استرب: 10 نقاط</div>
+                    <div>🔥 ولعات: 5 نقاط</div>
+                </div>
+
+                <button id="playBtn" class="w-full py-4 bg-gradient-to-r from-emerald-500 to-green-600 text-white font-black text-xl rounded-2xl shadow-lg transform active:scale-95 transition">
+                    ابدأ اللعب الآن 🚀
+                </button>
+            </div>
+        </div>
+
+        <!-- نافذة نهاية اللعبة -->
+        <div id="gameOverModal" class="absolute inset-0 bg-black/70 backdrop-blur-sm hidden flex-col items-center justify-center p-4 text-center text-white z-20">
+            <div class="bg-white text-slate-800 p-6 rounded-3xl shadow-2xl w-full max-w-xs border-4 border-red-500">
+                <div class="text-5xl mb-2">⏰</div>
+                <h2 class="text-3xl font-black text-red-600 mb-2">انتهى الوقت!</h2>
+                
+                <div class="bg-red-50 border border-red-200 rounded-xl p-5 mb-6 mt-2">
+                    <span class="block text-md text-gray-600 font-bold mb-1">إجمالي نقاطك</span>
+                    <span id="finalScore" class="text-5xl font-black text-emerald-700">0</span>
+                </div>
+
+                <button id="restartBtn" class="w-full py-4 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-black text-xl rounded-2xl shadow-lg transform active:scale-95 transition">
+                    العب مرة أخرى 🔄
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- أزرار التحكم وحقوق التصميم -->
+    <div class="w-full max-w-lg px-4 pb-2 z-10">
+        <!-- أزرار التحكم للموبايل -->
+        <div class="flex justify-between items-center gap-4 mb-4">
+            <button id="leftTouchBtn" class="flex-1 py-4 bg-white active:bg-emerald-200 border-2 border-emerald-500 rounded-2xl text-xl font-black text-emerald-800 shadow-md transition transform active:scale-95 flex items-center justify-center select-none">
+                ⬅️ يسار
+            </button>
+            <button id="rightTouchBtn" class="flex-1 py-4 bg-white active:bg-emerald-200 border-2 border-emerald-500 rounded-2xl text-xl font-black text-emerald-800 shadow-md transition transform active:scale-95 flex items-center justify-center select-none">
+                يمين ➡️
+            </button>
+        </div>
+        
+        <!-- حقوق التصميم -->
+        <div class="text-center font-bold text-gray-700 text-md mt-2 bg-white/70 p-3 rounded-xl border border-gray-200 shadow-sm w-full">
+            تصميم يوسف أبو آدم - <a href="tel:01020390989" class="text-blue-700 dir-ltr inline-block font-black">01020390989</a>
+        </div>
+    </div>
+
+    <!-- شريط الأخبار السفلي (الفروع والأرقام) -->
+    <div class="ticker-wrap">
+        <div class="ticker-content">
+            🛒 <strong>الفرع الرئيسي (العجوزة):</strong> 66 شارع أبو المحاسن الشاذلي، خلف مسرح البالون. للطلب: 01020982270 - 01105780708 - 0233446338 
+            &nbsp; | &nbsp; 
+            🛒 <strong>فرع المعادي:</strong> خلف كارفور المعادي، بجوار المدرسة الفرنسية. للطلب: 01105833441 - 01004623737 - 01147589888 
+            &nbsp; | &nbsp; 
+            🛒 <strong>فرع 6 أكتوبر:</strong> داخل محطة A1 الياسمين، الحي العاشر، بجوار مول المرشدي. للطلب: 01062127185 - 01150185531
+        </div>
+    </div>
+
+    <script>
+        // تعريف المتغيرات والعناصر
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        const scoreValEl = document.getElementById('scoreVal');
+        const timeValEl = document.getElementById('timeVal');
+        
+        const startModal = document.getElementById('startModal');
+        const gameOverModal = document.getElementById('gameOverModal');
+        const finalScoreEl = document.getElementById('finalScore');
+        
+        const playBtn = document.getElementById('playBtn');
+        const restartBtn = document.getElementById('restartBtn');
+        const leftTouchBtn = document.getElementById('leftTouchBtn');
+        const rightTouchBtn = document.getElementById('rightTouchBtn');
+
+        // قائمة المنتجات المطلوبة مع تفاصيلها
+        const ITEM_TYPES = [
+            { name: 'منتجات ميتكو', emoji: '📦', points: 25, width: 120, bg: '#fef3c7' }, // أصفر فاتح
+            { name: 'منتجات إيلو', emoji: '🥫', points: 20, width: 110, bg: '#e0f2fe' }, // أزرق فاتح
+            { name: 'استربس سمارت', emoji: '🍗', points: 15, width: 125, bg: '#ffe4e6' }, // وردي
+            { name: 'كيس استرب', emoji: '🍟', points: 10, width: 100, bg: '#ffedd5' }, // برتقالي فاتح
+            { name: 'ولعات', emoji: '🔥', points: 5, width: 80, bg: '#f3f4f6' } // رمادي فاتح
+        ];
+
+        let score = 0;
+        let timeLeft = 60;
+        let isRunning = false;
+        let animationFrameId = null;
+        let timerInterval = null;
+
+        let items = [];
+        let floatingTexts = [];
+        let lastSpawnTime = 0;
+        let spawnInterval = 1000;
+
+        // حالة سلة الماركت (اللاعب)
+        const cart = {
+            x: 0,
+            y: 0,
+            size: 60,
+            speed: 8,
+            targetX: null,
+            movingLeft: false,
+            movingRight: false
+        };
+
+        function resizeCanvas() {
+            const rect = canvas.parentNode.getBoundingClientRect();
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            ctx.scale(dpr, dpr);
+
+            // ضبط حجم السلة وموقعها بناءً على حجم الشاشة
+            cart.size = Math.min(70, Math.max(50, rect.width * 0.18));
+            cart.y = rect.height - cart.size - 10;
+            
+            if (cart.x === 0) {
+                cart.x = (rect.width - cart.size) / 2;
+            } else {
+                cart.x = Math.max(0, Math.min(rect.width - cart.size, cart.x));
+            }
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+
+        function addFloatingText(text, x, y, color = '#15803d') {
+            floatingTexts.push({ text, x, y, vy: -2, alpha: 1, color, life: 30 });
+        }
+
+        function getRandomItemType() {
+            return ITEM_TYPES[Math.floor(Math.random() * ITEM_TYPES.length)];
+        }
+
+        function spawnItem() {
+            const rect = canvas.getBoundingClientRect();
+            const type = getRandomItemType();
+            const x = Math.random() * (rect.width - type.width - 20) + 10;
+            const fallSpeed = Math.random() * 2 + 2.5; // سرعة السقوط
+
+            items.push({
+                x: x,
+                y: -50,
+                type: type,
+                speed: fallSpeed,
+            });
+        }
+
+        function updateGame(timestamp) {
+            if (!isRunning) return;
+            const rect = canvas.getBoundingClientRect();
+
+            // حركة السلة
+            if (cart.movingLeft) cart.x -= cart.speed;
+            if (cart.movingRight) cart.x += cart.speed;
+
+            // حركة اللمس المباشر على الشاشة
+            if (cart.targetX !== null) {
+                const dx = cart.targetX - (cart.x + cart.size / 2);
+                cart.x += dx * 0.2;
+            }
+
+            // منع السلة من الخروج عن حدود الشاشة
+            if (cart.x < 5) cart.x = 5;
+            if (cart.x > rect.width - cart.size - 5) cart.x = rect.width - cart.size - 5;
+
+            // توليد منتجات جديدة
+            if (timestamp - lastSpawnTime > spawnInterval) {
+                spawnItem();
+                lastSpawnTime = timestamp;
+            }
+
+            // تحديث حركة المنتجات والاصطدام
+            for (let i = items.length - 1; i >= 0; i--) {
+                const it = items[i];
+                it.y += it.speed;
+
+                // التحقق من التقاط السلة للمنتج
+                const hitX = (it.x + it.type.width > cart.x) && (it.x < cart.x + cart.size);
+                const hitY = (it.y + 40 > cart.y) && (it.y < cart.y + cart.size);
+
+                if (hitX && hitY) {
+                    score += it.type.points;
+                    scoreValEl.textContent = score;
+                    addFloatingText(`+${it.type.points}`, it.x + it.type.width/2, it.y, '#16a34a');
+                    items.splice(i, 1);
+                    continue;
+                }
+
+                // حذف المنتج إذا تجاوز أسفل الشاشة
+                if (it.y > rect.height) {
+                    items.splice(i, 1);
+                }
+            }
+
+            // تحديث نصوص النقاط الطائرة
+            for (let i = floatingTexts.length - 1; i >= 0; i--) {
+                const ft = floatingTexts[i];
+                ft.y += ft.vy;
+                ft.alpha -= 1 / ft.life;
+                if (ft.alpha <= 0) floatingTexts.splice(i, 1);
+            }
+        }
+
+        function drawGame() {
+            const rect = canvas.getBoundingClientRect();
+            ctx.clearRect(0, 0, rect.width, rect.height);
+
+            // رسم السلة
+            ctx.save();
+            ctx.font = `${cart.size}px Arial`;
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'top';
+            ctx.fillText('🛒', cart.x, cart.y);
+            ctx.restore();
+
+            // رسم المنتجات المتساقطة
+            for (const it of items) {
+                ctx.save();
+                // خلفية المنتج
+                ctx.fillStyle = it.type.bg;
+                ctx.shadowColor = 'rgba(0,0,0,0.15)';
+                ctx.shadowBlur = 5;
+                ctx.shadowOffsetY = 3;
+                ctx.beginPath();
+                ctx.roundRect(it.x, it.y, it.type.width, 36, 12);
+                ctx.fill();
+                
+                // إضافة إطار خفيف
+                ctx.lineWidth = 1;
+                ctx.strokeStyle = 'rgba(0,0,0,0.05)';
+                ctx.stroke();
+                
+                // النص والأيقونة
+                ctx.shadowColor = 'transparent';
+                ctx.fillStyle = '#0f172a';
+                ctx.font = 'bold 14px "Tajawal", sans-serif';
+                ctx.textAlign = 'right';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(it.type.name + ' ' + it.type.emoji, it.x + it.type.width - 8, it.y + 18);
+                ctx.restore();
+            }
+
+            // رسم النقاط الطائرة
+            for (const ft of floatingTexts) {
+                ctx.save();
+                ctx.globalAlpha = Math.max(0, ft.alpha);
+                ctx.fillStyle = ft.color;
+                ctx.font = 'black 22px "Tajawal", sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(ft.text, ft.x, ft.y);
+                ctx.restore();
+            }
+        }
+
+        function gameLoop(timestamp) {
+            updateGame(timestamp);
+            drawGame();
+            if (isRunning) {
+                animationFrameId = requestAnimationFrame(gameLoop);
+            }
+        }
+
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                timeValEl.textContent = timeLeft;
+                
+                // زيادة صعوبة اللعبة مع مرور الوقت
+                if(timeLeft === 40) spawnInterval = 850;
+                if(timeLeft === 20) spawnInterval = 650;
+                if(timeLeft === 10) spawnInterval = 500; // صعوبة قصوى آخر 10 ثواني
+
+                if (timeLeft <= 0) {
+                    endGame();
+                }
+            }, 1000);
+        }
+
+        function startGame() {
+            resizeCanvas();
+            score = 0;
+            timeLeft = 60;
+            items = [];
+            floatingTexts = [];
+            spawnInterval = 1100;
+            cart.targetX = null;
+            cart.movingLeft = false;
+            cart.movingRight = false;
+
+            scoreValEl.textContent = score;
+            timeValEl.textContent = timeLeft;
+
+            startModal.classList.add('hidden');
+            gameOverModal.classList.add('hidden');
+
+            isRunning = true;
+            lastSpawnTime = performance.now();
+            
+            clearInterval(timerInterval);
+            startTimer();
+            
+            cancelAnimationFrame(animationFrameId);
+            animationFrameId = requestAnimationFrame(gameLoop);
+        }
+
+        function endGame() {
+            isRunning = false;
+            clearInterval(timerInterval);
+            finalScoreEl.textContent = score;
+            gameOverModal.classList.remove('hidden');
+            gameOverModal.classList.add('flex');
+        }
+
+        // 1. التحكم بالماوس واللمس المباشر على منطقة اللعب
+        function handlePointerMove(e) {
+            if (!isRunning) return;
+            const rect = canvas.getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            cart.targetX = clientX - rect.left;
+        }
+
+        function handlePointerRelease() { 
+            cart.targetX = null; 
+        }
+
+        canvas.addEventListener('mousemove', handlePointerMove);
+        canvas.addEventListener('touchmove', handlePointerMove, { passive: true });
+        window.addEventListener('mouseup', handlePointerRelease);
+        window.addEventListener('touchend', handlePointerRelease);
+
+        // 2. التحكم بأسهم لوحة المفاتيح
+        window.addEventListener('keydown', (e) => {
+            if (!isRunning) return;
+            if (e.key === 'ArrowLeft' || e.key === 'KeyA') cart.movingLeft = true;
+            if (e.key === 'ArrowRight' || e.key === 'KeyD') cart.movingRight = true;
+        });
+
+        window.addEventListener('keyup', (e) => {
+            if (e.key === 'ArrowLeft' || e.key === 'KeyA') cart.movingLeft = false;
+            if (e.key === 'ArrowRight' || e.key === 'KeyD') cart.movingRight = false;
+        });
+
+        // 3. أزرار اللمس المخصصة للموبايل
+        const bindBtn = (btn, dir) => {
+            const start = (e) => { e.preventDefault(); cart[dir] = true; };
+            const stop = (e) => { e.preventDefault(); cart[dir] = false; };
+            btn.addEventListener('touchstart', start, { passive: false });
+            btn.addEventListener('touchend', stop);
+            btn.addEventListener('mousedown', start);
+            btn.addEventListener('mouseup', stop);
+            btn.addEventListener('mouseleave', stop);
+        };
+
+        bindBtn(leftTouchBtn, 'movingLeft');
+        bindBtn(rightTouchBtn, 'movingRight');
+
+        // ربط أزرار البدء والإعادة
+        playBtn.addEventListener('click', startGame);
+        restartBtn.addEventListener('click', startGame);
+
+        // التهيئة المبدئية
+        window.onload = () => {
+            resizeCanvas();
+            drawGame();
+        };
+    </script>
+</body>
+</html>
