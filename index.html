@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>لعبة الدكتور ماركت - الموسيقية الخفيفة</title>
+    <title>لعبة الدكتور ماركت - التشكيلة الكاملة</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700;900&display=swap" rel="stylesheet">
     <style>
         body {
@@ -162,7 +162,7 @@
 </head>
 <body>
 
-    <!-- ملف الموسيقى (تأكد من رفعه على جيت هوب باسم music.mp3) -->
+    <!-- ملف الموسيقى -->
     <audio id="bgMusic" loop>
         <source src="music.mp3" type="audio/mpeg">
     </audio>
@@ -228,7 +228,7 @@
         let currentBasketX = width / 2;
         let basketY = 0; 
 
-        // المنتجات الجديدة اللي طلبتها
+        // إضافة جميع المنتجات الشاملة بألوان ورموز مميزة
         const productTypes = [
             { name: 'منتجات فروزن', emoji: '🧊', color: '#00838F' },
             { name: 'مستلزمات مطاعم', emoji: '🍽️', color: '#455A64' },
@@ -236,7 +236,26 @@
             { name: 'منتجات ورقية', emoji: '📦', color: '#616161' },
             { name: 'صوصات ومرقات', emoji: '🥫', color: '#C62828' },
             { name: 'أطعمة مشروبات', emoji: '🧋', color: '#6A1B9A' },
-            { name: 'كايزر ماك', emoji: '🍔', color: '#EF6C00' }
+            { name: 'كايزر ماك', emoji: '🍔', color: '#EF6C00' },
+            { name: 'برجر لحمة', emoji: '🍔', color: '#5D4037' },
+            { name: 'برجر فراخ', emoji: '🍔', color: '#FFB300' },
+            { name: 'استربس', emoji: '🍗', color: '#D84315' },
+            { name: 'صدور فراشة', emoji: '🍗', color: '#b71c1c' },
+            { name: 'كوردن بلو', emoji: '🌯', color: '#F57C00' },
+            { name: 'ناجتس', emoji: '🧆', color: '#FF9800' },
+            { name: 'حلقات بصل', emoji: '🧅', color: '#F9A825' },
+            { name: 'سجق شرقي', emoji: '🌭', color: '#D32F2F' },
+            { name: 'كفتة', emoji: '🧆', color: '#4E342E' },
+            { name: 'نقانق', emoji: '🌭', color: '#C62828' },
+            { name: 'بانيه', emoji: '🍗', color: '#F57C00' },
+            { name: 'وجبة فرخة', emoji: '🍗', color: '#D84315' },
+            { name: 'فراخ تيكا', emoji: '🥘', color: '#E64A19' },
+            { name: 'جبنة موتزريلا', emoji: '🧀', color: '#FBC02D' },
+            { name: 'صوص شيدر', emoji: '🧀', color: '#F57F17' },
+            { name: 'زبادي', emoji: '🥛', color: '#00ACC1' },
+            { name: 'ريد بول', emoji: '⚡', color: '#1976D2' },
+            { name: 'بيبسي كان', emoji: '🥤', color: '#0D47A1' },
+            { name: 'في كولا', emoji: '🥤', color: '#b71c1c' }
         ];
         
         let items = [];
@@ -295,7 +314,6 @@
             clearInterval(gameInterval);
             clearInterval(dropInterval);
             
-            // إيقاف الموسيقى عند انتهاء الوقت
             bgMusic.pause();
 
             const startScreen = document.getElementById('start-screen');
@@ -310,18 +328,15 @@
         function gameLoop() {
             if (!isPlaying) return;
             
-            // مسح الشاشة بالكامل لتفادي التهنيج
             ctx.clearRect(0, 0, width, height);
             
             currentBasketX += (targetBasketX - currentBasketX) * 0.25;
 
-            // رسم الباسكت
             ctx.font = "120px Arial";
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
             ctx.fillText('🛒', Math.floor(currentBasketX), Math.floor(basketY));
             
-            // رسم المنتجات الجديدة
             for (let i = items.length - 1; i >= 0; i--) {
                 let item = items[i];
                 item.y += item.speed;
